@@ -18,16 +18,16 @@ def handler(event, context):
     # Parse the body of the request
     body = json.loads(event['body'])
 
-    # Check if phone_number and order details are present in the request
-    if 'phone_number' not in body or 'order_details' not in body:
+    # Check if email and order details are present in the request
+    if 'email' not in body or 'order_details' not in body:
         return {
             "statusCode": 400,
             "body": json.dumps({
-                "message": "Bad Request, phone_number and order_details are required."
+                "message": "Bad Request, email and order_details are required."
             }),
         }
 
-    phone_number = body['phone_number']
+    email = body['email']
     order_details = body['order_details']
 
     # Generate unique order ID
@@ -37,7 +37,7 @@ def handler(event, context):
     table.put_item(
         Item={
             'order_id': order_id,
-            'phone_number': phone_number,
+            'email': email,
             'order_status': 'Received',
             'order_details': order_details
         }

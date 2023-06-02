@@ -33,7 +33,7 @@ resource "aws_lambda_function" "order_status_updater" {
   filename      = data.archive_file.order_status_updater_zip.output_path
   function_name = "order_status_updater"
   role          = var.iam_role_arn
-  handler       = "order_status_updater.handler" # handler is the name of the Python function inside your .py file
+  handler       = "order_status_updater.handler"
   source_code_hash = data.archive_file.order_status_updater_zip.output_base64sha256
   runtime       = "python3.8"
 
