@@ -15,3 +15,9 @@ module "lambda" {
 module "sns" {
   source = "./modules/sns"
 }
+
+module "apigateway" {
+  source = "./modules/apigateway"
+  lambda_function_arn_webhook_handler = module.lambda.lambda_function_arn_webhook_handler
+  lambda_function_name_webhook_handler = module.lambda.lambda_function_name_webhook_handler
+}
