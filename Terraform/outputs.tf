@@ -1,6 +1,11 @@
-output "API_Gateway_URL" {
+output "Create_Order_Endpoint" {
   value = module.apigateway.api_invoke_url
   description = "URL for the API Gateway"
+}
+
+output "Update_Order_Endpoint" {
+  value = module.apigateway.api_invoke_url
+  
 }
 
 output "Database_Table_Name" {

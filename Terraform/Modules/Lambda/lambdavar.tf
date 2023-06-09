@@ -7,3 +7,13 @@ variable "dynamo_table_name" {
   description = "The name of the DynamoDB table"
   type        = string
 }
+
+variable "sqs_arn" {
+  description = "ARN of the SQS queue"
+  type        = string
+}
+
+variable "sqs_url" {
+  description = "URL of the SQS queue"
+  type        = string
+}

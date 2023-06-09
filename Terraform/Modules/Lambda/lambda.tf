@@ -37,9 +37,15 @@ resource "aws_lambda_function" "order_status_updater" {
   source_code_hash = data.archive_file.order_status_updater_zip.output_base64sha256
   runtime       = "python3.8"
 
+
+  dead_letter_config {
+    target_arn = var.sqs_arn
+  }
+
   environment {
     variables = {
       tableName = var.dynamo_table_name
+      DEAD_LETTER_QUEUE_URL = var.sqs_url
     }
   }
 }
