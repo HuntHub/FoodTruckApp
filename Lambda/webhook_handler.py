@@ -23,7 +23,7 @@ def handler(event, context):
         table.put_item(
             Item={
                 'order_id': order_id,
-                'email': email,
+                'payment_id': payment_id,
                 'order_status': new_status,
             }
         )
