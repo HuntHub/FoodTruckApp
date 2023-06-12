@@ -11,7 +11,7 @@ def handler(event, context):
 
     # Parse the order ID and new status from the event body
     body = json.loads(event['body'])
-    email = body['buyer_email_address']
+    payment_id = body['data']['object']['payment']['id']
     new_status = "Order Received"  # Assuming that the order status will be set to 'Order Received' when a payment is created
 
     # Generate a new order ID (for instance, using a UUID)
