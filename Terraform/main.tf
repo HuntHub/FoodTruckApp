@@ -10,8 +10,9 @@ module "lambda" {
   source = "./modules/lambda"
   iam_role_arn = module.iam.iam_role_arn
   dynamo_table_name = module.dynamodb.dynamo_table_name
-  sqs_arn = module.sqs.sqs_dead_letter_queue_arn
-  sqs_url = module.sqs.sqs_dead_letter_queue_url
+  sqs_arn = module.sqs.order_queue_arn
+  sqs_url = module.sqs.order_queue_url
+  SQUARE_API_TOKEN = "EAAAEP55lWQwSc-rSQS41rzwSKKCZIyJ2I1GitMw49ZA0jvNc6wbsX5eHq8luQi0"
 }
 
 module "sns" {
@@ -28,7 +29,6 @@ module "apigateway" {
 
 module "ses" {
   source       = "./modules/ses"
-  sender_email = "cloudbridgega@gmail.com"
 }
 
 module "sqs" {

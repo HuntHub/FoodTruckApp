@@ -1,41 +1,43 @@
 import json
 import boto3
-from botocore.exceptions import ClientError
+import os
 
 def handler(event, context):
     print(f"Received event: {json.dumps(event)}")
 
-    # Initialize a DynamoDB client
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('OrdersTable')  # Or whatever your table name is
-
-    # Parse the order ID and new status from the event body
+    sqs = boto3.client('sqs')
+    
+    # Get the Queue URL from the environment variables
+    queue_url = os.getenv('QUEUE_URL')
+    
+    # Parse the event body from the event
     body = json.loads(event['body'])
-    payment_id = body['data']['object']['payment']['id']
-    new_status = "Order Received"  # Assuming that the order status will be set to 'Order Received' when a payment is created
+    print(f"Body after JSON load: {json.dumps(body)}") 
 
-    # Generate a new order ID (for instance, using a UUID)
-    import uuid
-    order_id = str(uuid.uuid4())
+    # Extract payment object from the body
+    payment = body.get('data', {}).get('object', {}).get('payment')
 
-    # Create a new order record
-    try:
-        table.put_item(
-            Item={
-                'order_id': order_id,
-                'payment_id': payment_id,
-                'order_status': new_status,
-            }
-        )
+    if payment is None:
+        return {
+            'statusCode': 400,
+            'body': json.dumps("No 'payment' object in event body.")
+        }
 
-        response_body = f"Order {order_id} created with status {new_status}"
-        status_code = 200
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-        response_body = "Failed to create order"
-        status_code = 500
+    customer_id = payment.get('customer_id')
+    
+    if customer_id is None:
+        return {
+            'statusCode': 400,
+            'body': json.dumps("No 'customer_id' key in the payment object.")
+        }
+
+    # Send the customer_id to the SQS queue
+    sqs.send_message(
+        QueueUrl=queue_url,  
+        MessageBody=json.dumps({'customer_id': customer_id})
+    )
 
     return {
-        'statusCode': status_code,
-        'body': json.dumps(response_body)
+        'statusCode': 200,
+        'body': json.dumps("Webhook processed successfully.")
     }

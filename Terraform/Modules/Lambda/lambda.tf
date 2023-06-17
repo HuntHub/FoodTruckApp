@@ -17,11 +17,36 @@ resource "aws_lambda_function" "webhook_handler" {
   environment {
     variables = {
       tableName = var.dynamo_table_name
+      QUEUE_URL = var.sqs_url
     }
   }
 }
 
-# Lambda Function 2 - order_status_updater
+# Lambda Function 2 - customer_api_call
+
+data "archive_file" "customer_api_call_zip" {
+  type        = "zip"
+  source_dir = "${path.root}/../lambda/customer_api_call"
+  output_path = "${path.root}/../lambda/customer_api_call.zip"
+}
+
+resource "aws_lambda_function" "customer_api_call" {
+  filename = data.archive_file.customer_api_call_zip.output_path
+  function_name = "customer_api_call"
+  source_code_hash = data.archive_file.customer_api_call_zip.output_base64sha256
+  role = var.iam_role_arn
+  handler = "customer_api_call.handler"
+  runtime = "python3.8"
+  timeout = 15
+
+  environment {
+    variables = {
+      SQUARE_API_TOKEN = "EAAAEP55lWQwSc-rSQS41rzwSKKCZIyJ2I1GitMw49ZA0jvNc6wbsX5eHq8luQi0"
+    }
+  }
+}
+
+# Lambda Function 3 - order_status_updater
 
 data "archive_file" "order_status_updater_zip" {
   type        = "zip"
@@ -48,4 +73,10 @@ resource "aws_lambda_function" "order_status_updater" {
       DEAD_LETTER_QUEUE_URL = var.sqs_url
     }
   }
+}
+
+resource "aws_lambda_event_source_mapping" "sqs_event" {
+  event_source_arn = var.sqs_arn
+  function_name   = aws_lambda_function.customer_api_call.function_name
+  batch_size      = 10
 }

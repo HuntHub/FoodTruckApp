@@ -17,3 +17,8 @@ variable "sqs_url" {
   description = "URL of the SQS queue"
   type        = string
 }
+
+variable "SQUARE_API_TOKEN" {
+  description = "SquareAPIToken"
+  type = string
+}
