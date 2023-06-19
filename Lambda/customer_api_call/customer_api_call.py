@@ -21,7 +21,7 @@ def handler(event, context):
 
     # Make a GET request to the Customers API
     square_api_url = f"https://connect.squareupsandbox.com/v2/customers/{customer_id}"
-    headers = {"Authorization": f"Bearer EAAAEP55lWQwSc-rSQS41rzwSKKCZIyJ2I1GitMw49ZA0jvNc6wbsX5eHq8luQi0"}  # Pull Square API token from environment variables
+    headers = {"Authorization": f"Bearer {os.environ.get('SQUARE_API_TOKEN')}"}
     response = requests.get(square_api_url, headers=headers)
 
     if response.status_code == 200:

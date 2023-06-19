@@ -12,7 +12,8 @@ module "lambda" {
   dynamo_table_name = module.dynamodb.dynamo_table_name
   sqs_arn = module.sqs.order_queue_arn
   sqs_url = module.sqs.order_queue_url
-  SQUARE_API_TOKEN = "EAAAEP55lWQwSc-rSQS41rzwSKKCZIyJ2I1GitMw49ZA0jvNc6wbsX5eHq8luQi0"
+  WEBHOOK_SIGNATURE_KEY = var.WEBHOOK_SIGNATURE_KEY
+  SQUARE_API_TOKEN = var.SQUARE_API_TOKEN
 }
 
 module "sns" {

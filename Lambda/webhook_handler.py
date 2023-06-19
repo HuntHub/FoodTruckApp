@@ -1,6 +1,35 @@
 import json
 import boto3
 import os
+import hashlib
+import hmac
+import base64
+
+webhook_signature_key = os.environ.get('WEBHOOK_SIGNATURE_KEY')
+
+def is_valid_callback(signature_header_value, string_to_sign):
+    # Create a HMAC-SHA256 hash of the string_to_sign
+    hash = hmac.new(bytes(webhook_signature_key, 'utf-8'), string_to_sign.encode('utf-8'), hashlib.sha256)
+
+    # Compare the original signature to the one you just created
+    return hmac.compare_digest(signature_header_value, hash.hexdigest())
+
+def handler(event, context):
+    print(f"Received event: {json.dumps(event)}")
+    
+    # Obtain Square-Signature header
+    signature_header_value = event['headers'].get('Square-Signature')
+
+    # Concatenate your notification URL, the timestamp, and the body of the notification
+    string_to_sign = event['url'] + event['headers']['x-square-signature'] + event['body']
+
+    # Verify the message
+    if not is_valid_callback(signature_header_value, string_to_sign):
+        print("Failed to verify callback")
+        return {
+            'statusCode': 403,
+            'body': 'Failed to verify callback'
+        }
 
 def handler(event, context):
     print(f"Received event: {json.dumps(event)}")

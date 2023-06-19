@@ -16,6 +16,7 @@ resource "aws_lambda_function" "webhook_handler" {
 
   environment {
     variables = {
+      WEBHOOK_SIGNATURE_KEY = var.WEBHOOK_SIGNATURE_KEY
       tableName = var.dynamo_table_name
       QUEUE_URL = var.sqs_url
     }
@@ -41,7 +42,7 @@ resource "aws_lambda_function" "customer_api_call" {
 
   environment {
     variables = {
-      SQUARE_API_TOKEN = "EAAAEP55lWQwSc-rSQS41rzwSKKCZIyJ2I1GitMw49ZA0jvNc6wbsX5eHq8luQi0"
+      SQUARE_API_TOKEN = var.SQUARE_API_TOKEN
     }
   }
 }
