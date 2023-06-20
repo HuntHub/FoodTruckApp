@@ -5,6 +5,7 @@ import hashlib
 import hmac
 import base64
 
+
 webhook_signature_key = os.environ.get('WEBHOOK_SIGNATURE_KEY')
 
 def is_valid_callback(signature_header_value, string_to_sign):

@@ -2,6 +2,7 @@ import json
 import boto3
 from botocore.exceptions import ClientError
 
+
 def handler(event, context):
     print(f"Received event: {json.dumps(event)}")
 

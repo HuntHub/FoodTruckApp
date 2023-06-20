@@ -4,6 +4,7 @@ import requests
 import os
 import uuid
 
+
 def handler(event, context):
     print(f"Received event: {json.dumps(event)}")
     
