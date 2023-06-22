@@ -18,7 +18,27 @@ def handler(event, context):
     order_id = body['order_id']
     new_status = body['new_status']
 
-    # Update the DynamoDB record
+    # Get the order from DynamoDB
+    try:
+        response = table.get_item(Key={'order_id': order_id})
+        if 'Item' not in response:
+            # Order does not exist, handle it.
+            print(f"Order {order_id} does not exist")
+            return {
+                'statusCode': 404,
+                'body': json.dumps(f"Order {order_id} not found")
+            }
+        else:
+            order = response['Item']
+            email_recipient = order['email']  # Replace 'email' with the actual name of your email field
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+        return {
+            'statusCode': 500,
+            'body': json.dumps("Failed to get order")
+        }
+
+    # If we have reached this point, we have the order and can update it
     try:
         table.update_item(
             Key={'order_id': order_id},
@@ -34,7 +54,6 @@ def handler(event, context):
         if new_status == 'Ready':
             email_subject = "Order Status Update"
             email_body = f"Your order {order_id} is now Ready."
-            email_recipient = "hunter.hartnett.moseley@gmail.com"  # replace with the recipient email
             email_source = "cloudbridgega@gmail.com"  # replace with your verified SES email
 
             try:
