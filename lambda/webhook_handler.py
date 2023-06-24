@@ -21,7 +21,7 @@ def handler(event, context):
     signature_header_value = event['headers'].get('Square-Signature')
 
     # Concatenate your notification URL, the timestamp, and the body of the notification
-    string_to_sign = event['url'] + event['headers']['x-square-signature'] + event['body']
+    string_to_sign = event['headers']['Host'] + event['path'] + event['headers']['x-square-signature'] + event['body']
 
     # Verify the message
     if not is_valid_callback(signature_header_value, string_to_sign):
