@@ -14,6 +14,7 @@ module "lambda" {
   sqs_url = module.sqs.order_queue_url
   WEBHOOK_SIGNATURE_KEY = var.WEBHOOK_SIGNATURE_KEY
   SQUARE_API_TOKEN = var.SQUARE_API_TOKEN
+  WEBHOOK_NOTIFICATION_URL = var.WEBHOOK_NOTIFICATION_URL
 }
 
 module "sns" {

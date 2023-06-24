@@ -29,3 +29,9 @@ variable "SQUARE_API_TOKEN" {
   type        = string
   sensitive   = true
 }
+
+variable "WEBHOOK_NOTIFICATION_URL" {
+  description = "The URL that webhooks are sent to"
+  type        = string
+  sensitive   = true
+}
