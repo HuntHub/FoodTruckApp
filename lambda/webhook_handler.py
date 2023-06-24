@@ -6,6 +6,7 @@ import hmac
 import base64
 
 webhook_signature_key = os.environ.get('WEBHOOK_SIGNATURE_KEY')
+webhook_notification_url = os.environ.get('WEBHOOK_NOTIFICATION_URL')  # Add the URL as an environment variable
 
 def is_valid_callback(signature_header_value, string_to_sign):
     # Create a HMAC-SHA256 hash of the string_to_sign
@@ -18,26 +19,19 @@ def handler(event, context):
     print(f"Received event: {json.dumps(event)}")
     
     # Obtain Square-Signature header
-    signature_header_value = event['headers'].get('x-square-signature')
+    signature_header_value = event['headers'].get('x-square-hmacsha256-signature')
 
-    # Concatenate your notification URL, the timestamp, and the body of the notification
-    string_to_sign = event['headers']['Host'] + event['path'] + event['headers']['x-square-signature'] + event['body']
+    # Concatenate your notification URL and the raw body of the notification
+    string_to_sign = webhook_notification_url + event['body']
 
-    if signature_header_value and string_to_sign:
-        # Verify the message
-        if not is_valid_callback(signature_header_value, string_to_sign):
-            print("Failed to verify callback")
-            return {
-                'statusCode': 403,
-                'body': 'Failed to verify callback'
-            }
-    else:
-        print("Missing required headers")
+    # Verify the message
+    if not is_valid_callback(signature_header_value, string_to_sign):
+        print("Failed to verify callback")
         return {
-            'statusCode': 400,
-            'body': 'Missing required headers'
+            'statusCode': 403,
+            'body': 'Failed to verify callback'
         }
-
+    
     sqs = boto3.client('sqs')
     
     # Get the Queue URL from the environment variables
