@@ -1,5 +1,5 @@
 # Lambda Function 1 - webhook_handler
-/*
+
 data "archive_file" "webhook_handler_zip" {
   type        = "zip"
   source_file = "${path.root}/../lambda/webhook_handler.py"
@@ -22,7 +22,7 @@ resource "aws_lambda_function" "webhook_handler" {
     }
   }
 }
-*/
+
 # Lambda Function 2 - customer_api_call
 
 data "archive_file" "customer_api_call_zip" {
