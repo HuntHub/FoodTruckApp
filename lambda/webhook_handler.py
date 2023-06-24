@@ -18,19 +18,26 @@ def handler(event, context):
     print(f"Received event: {json.dumps(event)}")
     
     # Obtain Square-Signature header
-    signature_header_value = event['headers'].get('Square-Signature')
+    signature_header_value = event['headers'].get('x-square-signature')
 
     # Concatenate your notification URL, the timestamp, and the body of the notification
     string_to_sign = event['headers']['Host'] + event['path'] + event['headers']['x-square-signature'] + event['body']
 
-    # Verify the message
-    if not is_valid_callback(signature_header_value, string_to_sign):
-        print("Failed to verify callback")
+    if signature_header_value and string_to_sign:
+        # Verify the message
+        if not is_valid_callback(signature_header_value, string_to_sign):
+            print("Failed to verify callback")
+            return {
+                'statusCode': 403,
+                'body': 'Failed to verify callback'
+            }
+    else:
+        print("Missing required headers")
         return {
-            'statusCode': 403,
-            'body': 'Failed to verify callback'
+            'statusCode': 400,
+            'body': 'Missing required headers'
         }
-    
+
     sqs = boto3.client('sqs')
     
     # Get the Queue URL from the environment variables
