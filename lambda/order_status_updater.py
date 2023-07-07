@@ -20,46 +20,53 @@ def handler(event, context):
 
     # Update the DynamoDB record
     try:
-        table.update_item(
-            Key={'order_id': order_id},
-            UpdateExpression='SET #os = :s',
-            ExpressionAttributeNames={'#os': 'order_status'},
-            ExpressionAttributeValues={':s': new_status}
-        )
+        # First, retrieve the order details from the table
+        response = table.get_item(Key={'order_id': order_id})
 
-        response_body = f"Order {order_id} updated to {new_status}"
-        status_code = 200
+        # Check if the order exists
+        if 'Item' in response:
+            item = response['Item']
+            email_recipient = item.get('email')  # retrieve the email from the order item
+            if email_recipient is None:
+                raise ValueError("No email address associated with the order")
 
-        # If order status updated to 'Ready', send an email
-        if new_status == 'Ready':
-            email_subject = "Order Status Update"
-            email_body = f"Your order {order_id} is now Ready."
-            email_recipient = "hunter.hartnett.moseley@gmail.com"  # replace with the recipient email
-            email_source = "cloudbridgega@gmail.com"  # replace with your verified SES email
+            # Rest of your code...
 
-            try:
-                ses.send_email(
-                    Destination={
-                        'ToAddresses': [email_recipient]
-                    },
-                    Message={
-                        'Body': {
-                            'Text': {
-                                'Data': email_body
+            # If order status updated to 'Ready', send an email
+            if new_status == 'Ready':
+                email_subject = "Order Status Update"
+                email_body = f"Your order {order_id} is now Ready."
+                email_source = "cloudbridgega@gmail.com"  # replace with your verified SES email
+
+                try:
+                    ses.send_email(
+                        Destination={
+                            'ToAddresses': [email_recipient]
+                        },
+                        Message={
+                            'Body': {
+                                'Text': {
+                                    'Data': email_body
+                                },
+                            },
+                            'Subject': {
+                                'Data': email_subject
                             },
                         },
-                        'Subject': {
-                            'Data': email_subject
-                        },
-                    },
-                    Source=email_source
-                )
-            except ClientError as e:
-                print(f"Failed to send email: {e.response['Error']['Message']}")
+                        Source=email_source
+                    )
+                except ClientError as e:
+                    print(f"Failed to send email: {e.response['Error']['Message']}")
+        else:
+            raise ValueError("Order does not exist")
 
     except ClientError as e:
         print(e.response['Error']['Message'])
         response_body = "Failed to update order"
+        status_code = 500
+    except ValueError as e:
+        print(e)
+        response_body = str(e)
         status_code = 500
 
     return {
