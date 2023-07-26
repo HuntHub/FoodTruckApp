@@ -26,6 +26,7 @@ module "apigateway" {
   lambda_function_name_webhook_handler = module.lambda.lambda_function_name_webhook_handler
   lambda_function_arn_order_updater = module.lambda.lambda_function_arn_order_updater
   lambda_function_name_order_updater = module.lambda.lambda_function_name_order_updater
+  region = var.region
 }
 
 module "ses" {

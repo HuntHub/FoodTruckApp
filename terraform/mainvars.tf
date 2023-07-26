@@ -9,3 +9,8 @@ variable "SQUARE_API_TOKEN" {
   type        = string
   sensitive   = true
 }
+
+variable "region" {
+  description = "The region in which the resources are to be deployed"
+  type = string
+}

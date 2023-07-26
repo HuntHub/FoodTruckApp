@@ -20,7 +20,7 @@ resource "aws_api_gateway_integration" "integration2" {
   http_method = aws_api_gateway_method.method2.http_method
   depends_on = [var.lambda_function_name_order_updater]
   type = "AWS_PROXY"
-  uri  = "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${var.lambda_function_arn_order_updater}/invocations"
+  uri  = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${var.lambda_function_arn_order_updater}/invocations"
   integration_http_method = "POST"
 }
 

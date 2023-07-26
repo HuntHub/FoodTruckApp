@@ -1,3 +1,3 @@
 provider "aws" {
-  region = "us-east-1"
+  region = var.region // changed from us-east-1 because no statefile for that region
 }
