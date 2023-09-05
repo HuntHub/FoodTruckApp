@@ -37,12 +37,12 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
       },
        {
         Effect   = "Allow",
-        Action   = ["dynamodb:PutItem", "dynamodb:GetItem"],
+        Action   = ["dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:DeleteItem", "dynamodb:Scan"],
         Resource = "*"
       },
       {
         Effect   = "Allow",
-        Action   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"]
+        Action   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "execute-api:Invoke", "execute-api:ManageConnections"]
         Resource = "*"
       }
     ]

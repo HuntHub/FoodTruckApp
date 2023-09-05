@@ -3,8 +3,13 @@ variable "iam_role_arn" {
   type        = string
 }
 
-variable "dynamo_table_name" {
-  description = "The name of the DynamoDB table"
+variable "dynamo_order_table" {
+  description = "The name of the DynamoDB table that stores the order IDs"
+  type        = string
+}
+
+variable "dynamo_connection_table" {
+  description = "The name of the DynamoDB table that stores the connection IDs"
   type        = string
 }
 
@@ -28,4 +33,9 @@ variable "SQUARE_API_TOKEN" {
   description = "The token for the Square API"
   type        = string
   sensitive   = true
+}
+
+variable "websocket_url" {
+  description = "URL for the websocket API"
+  type        = string
 }

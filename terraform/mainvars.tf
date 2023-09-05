@@ -14,3 +14,8 @@ variable "region" {
   description = "The region in which the resources are to be deployed"
   type = string
 }
+
+variable "websocket_url" {
+  description = "The endpoint of the websocket API"
+  type = string
+}

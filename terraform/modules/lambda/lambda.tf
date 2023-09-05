@@ -17,7 +17,7 @@ resource "aws_lambda_function" "webhook_handler" {
   environment {
     variables = {
       WEBHOOK_SIGNATURE_KEY = var.WEBHOOK_SIGNATURE_KEY
-      tableName = var.dynamo_table_name
+      tableName = var.dynamo_order_table
       QUEUE_URL = var.sqs_url
     }
   }
@@ -70,7 +70,7 @@ resource "aws_lambda_function" "order_status_updater" {
 
   environment {
     variables = {
-      tableName = var.dynamo_table_name
+      tableName = var.dynamo_order_table
       DEAD_LETTER_QUEUE_URL = var.sqs_url
     }
   }

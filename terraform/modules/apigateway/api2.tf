@@ -39,7 +39,9 @@ resource "aws_api_gateway_deployment" "deployment2" {
   depends_on  = [
     aws_api_gateway_integration.integration2, 
     aws_api_gateway_method.method2,
-    aws_api_gateway_resource.resource2
+    aws_api_gateway_resource.resource2,
+    var.lambda_function_name_order_updater,
+    aws_lambda_permission.permission
   ]
   rest_api_id = aws_api_gateway_rest_api.api.id
   stage_name  = "test"
