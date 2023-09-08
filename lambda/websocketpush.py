@@ -2,26 +2,31 @@ import boto3
 import json
 import os
 
+
+
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('WebSocketConnections')
 websocket_url = os.environ['websocket_url']
 
 def handler(event, context):
     client = boto3.client('apigatewaymanagementapi', endpoint_url=websocket_url)
-    
+
+    print("Received event:", json.dumps(event))
+
     for record in event['Records']:
-        if record['eventName'] == 'MODIFY':
+        if record['eventName'] == 'INSERT':
             order_id = record['dynamodb']['Keys']['order_id']['S']
-            
-            # Simply notify connected clients of the updated order
-            send_websocket_notification(client, order_id)
+            send_websocket_notification(client, "New order", order_id)
+        elif record['eventName'] == 'MODIFY':
+            order_id = record['dynamodb']['Keys']['order_id']['S']
+            send_websocket_notification(client, "Order updated", order_id)
 
     return {
         'statusCode': 200,
         'body': 'Processed.'
     }
 
-def send_websocket_notification(client, order_id):
+def send_websocket_notification(client, message_type, order_id):
     # Get all connection IDs with pagination
     connection_ids = []
     scan_kwargs = {}
@@ -33,13 +38,16 @@ def send_websocket_notification(client, order_id):
         done = start_key is None
         scan_kwargs['ExclusiveStartKey'] = start_key
 
-    # Broadcast message to all connected clients about the updated order
+    # Broadcast message to all connected clients with the specified message type
     for connection_id in connection_ids:
         try:
+            data = {"message": message_type, "order_id": order_id}
             client.post_to_connection(
                 ConnectionId=connection_id,
-                Data=json.dumps({"message": "Order updated", "order_id": order_id})
+                Data=json.dumps(data)
             )
+            print(f"Sent data to connection {connection_id}: {json.dumps(data)}")
+            
         except client.exceptions.GoneException:
             # Client is no longer connected. Remove from DynamoDB
             table.delete_item(Key={"connectionId": connection_id})
