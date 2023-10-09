@@ -3,7 +3,11 @@ import boto3
 import requests
 import os
 import uuid
+import base64
 
+def generate_order_id():
+    # Generates a URL-safe order ID using the os.urandom method.
+    return base64.b64encode(os.urandom(9)).decode('utf-8').rstrip('==')
 
 def handler(event, context):
     print(f"Received event: {json.dumps(event)}")
@@ -28,11 +32,21 @@ def handler(event, context):
     if response.status_code == 200:
         customer_data = response.json()
         print(f"Received customer data: {customer_data}")
+
+        # Extract first name and last initial
+        first_name = customer_data['customer'].get('given_name', '')
+        last_initial = customer_data['customer']['family_name'][0] if customer_data['customer'].get('family_name') else ''
+
+        # Determine the order_id based on the provided conditions
+        if first_name and last_initial:
+            order_id = f"{first_name} {last_initial}"
+        elif first_name:
+            order_id = first_name
+        else:
+            order_id = generate_order_id()
+
         email = customer_data['customer']['email_address']  # Confirm this is the correct key path
         new_status = "Order Received"  # Assuming that the order status will be set to 'Order Received' when a payment is created
-
-        # Generate a new order ID (for instance, using a UUID)
-        order_id = str(uuid.uuid4())
 
         # Create a new order record
         try:

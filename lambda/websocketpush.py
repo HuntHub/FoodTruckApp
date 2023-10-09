@@ -25,7 +25,7 @@ def handler(event, context):
         'statusCode': 200,
         'body': 'Processed.'
     }
-
+ 
 def send_websocket_notification(client, message_type, order_id):
     # Get all connection IDs with pagination
     connection_ids = []
